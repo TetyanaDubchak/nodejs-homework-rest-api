@@ -17,7 +17,7 @@ router.get('/', async (req, res, next) => {
  
 router.get('/:contactId', async (req, res, next) => {
   try {
-    const contactId = req.params.id;
+    const contactId = req.params.contactId;
     const contact = await Contacts.getContactById(contactId);
     if (contact) {
       res.json({ message: contact });
@@ -28,19 +28,53 @@ router.get('/:contactId', async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-  res.json({ message: 'Contact' })
+
 })
 
 router.post('/', jsonParser, async (req, res, next) => {
-  res.json({ message: 'Created contact' })
+    try {
+    const {name, email, phone} = req.body;
+    const contact = await Contacts.addContact(name, email, phone);
+    
+    res.status(201).json({contact });
+  
+    
+  } catch (error) {
+    next(error);
+  }
+  
 })
 
 router.delete('/:contactId', async (req, res, next) => {
-  res.json({ message: 'Deleted contact' })
+    try {
+      const contactId = req.params.contactId;
+      const contact = await Contacts.removeContact(contactId);
+      
+      if (contact) {
+      res.json({ message: 'Contact deleted '});
+    } else {
+      res.status(404).json({message: "Not found"})
+    }
+  } catch (error) {
+      next(error);
+  }
 })
  
 router.put('/:contactId',jsonParser, async (req, res, next) => {
-  res.json({ message: 'Change contact' })
+    try {
+      const { name, email, phone } = req.body;
+      const contactId = req.params.contactId;
+      const updatedContact = await Contacts.updateContact(contactId,name, email, phone);
+      
+    if (updatedContact) {
+      res.json({ updatedContact });
+    } else {
+      res.status(404).json({ message: '"Not found"' });
+    }
+    
+  } catch (error) {
+      next(error);
+  }
 })
 
 module.exports = router
