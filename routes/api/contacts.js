@@ -14,7 +14,7 @@ router.use(morgan('combined'));
 router.get('/', async (req, res, next) => {
   try {
     const allContacts = await Contacts.listContacts();
-    res.json({ message: allContacts })
+    res.json(allContacts)
   } catch (error) {
     next(error);
   }
@@ -25,7 +25,7 @@ router.get('/:contactId', async (req, res, next) => {
     const contactId = req.params.contactId;
     const contact = await Contacts.getContactById(contactId);
     if (contact) {
-      res.json({ message: contact });
+      res.json(contact);
     } else {
       next();
     }
@@ -43,14 +43,10 @@ router.post('/', jsonParser, async (req, res, next) => {
     if (typeof validatedStatus.error !== "undefined") {
       return res.status(400).json(validatedStatus.error.details.map((err) => err.message).join(", "));
     }
-    const { name, email, phone } = validatedStatus.value;
 
-    if (!name || !email || !phone) {
-      return  res.status(400).json({message:  "Missing required name field" });
-    }
-    const contact = await Contacts.addContact(name, email, phone);
+    const contact = await Contacts.addContact(validatedStatus.value);
     
-    res.status(201).json({contact });
+    res.status(201).json(contact );
   
   } catch (error) {
     next(error);
@@ -80,18 +76,12 @@ router.put('/:contactId',jsonParser, async (req, res, next) => {
 
       if (typeof validatedStatus.error !== "undefined") {
         return res.status(400).json(validatedStatus.error.details.map((err) => err.message).join(", "));
-      }
-      const { name, email, phone } = validatedStatus.value;
-        
+      }        
       const contactId = req.params.contactId;
-      const updatedContact = await Contacts.updateContact(contactId, name, email, phone);
-      
-      if (!body) {
-        return res.status(400).json({message: "Missing fields" });
-      }
+      const updatedContact = await Contacts.updateContact(contactId, validatedStatus.value);
       
       if (updatedContact) {
-        res.json({ updatedContact });
+        res.json( updatedContact );
       } else {
         next();
       }
