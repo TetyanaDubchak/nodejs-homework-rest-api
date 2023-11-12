@@ -7,14 +7,16 @@ const contactSchema = new mongoose.Schema({
     },
     email: {
       type: String,
+      required: [true, 'Set email for contact'],
     },
     phone: {
       type: String,
+      required: [true, 'Set phone for contact'],
     },
     favorite: {
       type: Boolean,
       default: false,
-    },
+  }
 })
 
 module.exports = mongoose.model('Contact', contactSchema); 
