@@ -3,7 +3,6 @@ const Contact = require('../models/contact');
 async function listContacts(req, res, next) {
   try {
     const contacts = await Contact.find().exec();
-    console.log(contacts);
     res.json(contacts);
   } catch (error) {
     next(error); 
@@ -35,9 +34,12 @@ async function addContact(req, res, next) {
  
   try {
     const answer = await Contact.create(contact);
-    console.log(answer);
     res.json(answer);
-  }catch (error) {
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(e => e.message);
+      return res.status(400).json(validationErrors);
+    }
     next(error);
   }
 }
@@ -75,7 +77,7 @@ async function updateContact(req, res, next) {
     } 
     
     res.json(answer)
-  }catch (error) {
+  } catch (error) {
       next(error);
   }
 }
@@ -97,7 +99,7 @@ async function updateStatusContact (req, res, next) {
       return next()
     }
 
-  }catch (error) {
+  } catch (error) {
       next(error);
   }
 }
