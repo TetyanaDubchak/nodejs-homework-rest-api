@@ -7,7 +7,8 @@ require("./db");
 // const DB_URI = "mongodb+srv://Tanja:ZP9BetQnnZNkKxlX@first-cluster.fftxkpz.mongodb.net/?retryWrites=true&w=majority"
 // const client = new MongoClient(DB_URI);
 
-const contactsRouter = require('./routes/api/contacts')
+const contactsRouter = require('./routes/api/contacts');
+const authRouter = require('./routes/api/auth');
 
 const app = express()
 
@@ -17,23 +18,8 @@ app.use(logger(formatsLogger))
 app.use(cors())
 app.use(express.json())
 
-app.use('/api/contacts', contactsRouter)
-
-// async function run() {
-//   try {
-//     await client.connect();
-//     const dbContacts = client.db('db-contacts');
-//     const name = 'contacts'
-//     const collection = await dbContacts.collection(name)
-//     const allContacts = await collection.find({}).toArray();
-//     console.log(allContacts);
-//   } catch (error) {
-//     console.error(error);
-//   } finally {
-//     await client.close()
-//   }
-// }
-//  run().catch(console.error)
+app.use('/api/contacts', contactsRouter);
+app.use('/api/users', authRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found' })
