@@ -36,12 +36,10 @@ function auth(req, res, next) {
 
             next()
         } catch (error) {
-            
+            next(error)
         }
         
-    });
-    
-    next()
+    })
 }
 
 module.exports = auth;

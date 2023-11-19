@@ -6,6 +6,7 @@ require('dotenv').config();
 require('../../db');
 
 const ContactController = require('../../controllers/contact');
+const authMiddleware = require('../../middleware/auth');
 
 const router = express.Router();
 const jsonParser = express.json();
@@ -13,17 +14,17 @@ const jsonParser = express.json();
 router.use(cors());
 router.use(morgan('combined'));
 
-router.get('/', ContactController.listContacts)
+router.get('/',authMiddleware, ContactController.listContacts)
  
-router.get('/:contactId', ContactController.getContactById)
+router.get('/:contactId',authMiddleware, ContactController.getContactById)
 
-router.post('/', jsonParser, ContactController.addContact)
+router.post('/', jsonParser,authMiddleware, ContactController.addContact)
 
-router.delete('/:contactId', ContactController.removeContact)
+router.delete('/:contactId',authMiddleware, ContactController.removeContact)
 
-router.put('/:contactId',jsonParser, ContactController.updateContact)
+router.put('/:contactId',jsonParser,authMiddleware, ContactController.updateContact)
 
-router.patch('/:contactId/favorite',jsonParser, ContactController.updateStatusContact)
+router.patch('/:contactId/favorite',jsonParser,authMiddleware, ContactController.updateStatusContact)
 
 router.use((_, res) => {
   res.status(404).json(" Not Found");
