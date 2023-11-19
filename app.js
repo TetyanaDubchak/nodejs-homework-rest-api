@@ -1,14 +1,13 @@
 const express = require('express')
 const logger = require('morgan')
 const cors = require('cors')
-// const { MongoClient } = require("mongodb");
+
 require("./db");
 
-// const DB_URI = "mongodb+srv://Tanja:ZP9BetQnnZNkKxlX@first-cluster.fftxkpz.mongodb.net/?retryWrites=true&w=majority"
-// const client = new MongoClient(DB_URI);
-
+const auth = require('./middleware/auth');
 const contactsRouter = require('./routes/api/contacts');
 const authRouter = require('./routes/api/auth');
+
 
 const app = express()
 
@@ -18,7 +17,7 @@ app.use(logger(formatsLogger))
 app.use(cors())
 app.use(express.json())
 
-app.use('/api/contacts', contactsRouter);
+app.use('/api/contacts', auth, contactsRouter);
 app.use('/api/users', authRouter);
 
 app.use((req, res) => {

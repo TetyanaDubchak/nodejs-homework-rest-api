@@ -2,7 +2,12 @@ const Contact = require('../models/contact');
 
 async function listContacts(req, res, next) {
   try {
-    const contacts = await Contact.find().exec();
+    const contacts = await Contact.find({owner: req.user.id}).exec();
+
+    if (contacts === null) {
+      return res.status(404).json('Contact not found')
+    }
+
     res.json(contacts);
   } catch (error) {
     next(error); 
@@ -17,6 +22,10 @@ async function getContactById(req, res, next) {
     if (contact === null) {
       return res.status(404).json('Contact not found')
     }
+   
+    if (contact.owner.toString() !== req.user.id) {
+      return res.status(404).json('Contact not found')
+    }
 
     res.json(contact);
   } catch (error) {
@@ -29,12 +38,18 @@ async function addContact(req, res, next) {
     name: req.body.name,
     email: req.body.email,
     phone: req.body.phone,
-    favorite: req.body.favorite
+    favorite: req.body.favorite,
+    owner: req.user.id
   }
  
   try {
-    const answer = await Contact.create(contact);
-    res.json(answer);
+    const newContact = await Contact.create(contact);
+
+    if (newContact.owner.toString() !== req.user.id) {
+      return res.status(403).json('Contact not found')
+    }
+
+    res.json(newContact);
   } catch (error) {
     if (error.name === 'ValidationError') {
       const validationErrors = Object.values(error.errors).map(e => e.message);
@@ -51,6 +66,10 @@ async function removeContact(req, res, next) {
     const answer = await Contact.findByIdAndDelete(contactId);
 
     if (answer === null) {
+      return res.status(404).json('Contact not found')
+    }
+
+    if (answer.owner.toString() !== req.user.id) {
       return res.status(404).json('Contact not found')
     }
     res.json(answer)
@@ -75,6 +94,10 @@ async function updateContact(req, res, next) {
     if (answer === null) {
       return res.status(404).json('Contact not found')
     } 
+
+    if (answer.owner.toString() !== req.user.id) {
+      return res.status(404).json('Contact not found')
+    }
     
     res.json(answer)
   } catch (error) {
@@ -92,12 +115,15 @@ async function updateStatusContact (req, res, next) {
 
   try {
     const answer = await Contact.findByIdAndUpdate(contactId, {favorite});
-
+    if (answer.owner.toString() !== req.user.id) {
+      return res.status(404).json('Contact not found')
+    }
     if (answer) {
       return res.status(200).json(answer);
     } else {
       return next()
     }
+
 
   } catch (error) {
       next(error);
