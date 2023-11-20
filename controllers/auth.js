@@ -2,13 +2,20 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
+const authSchema = require("../schemas_validation/auth");
+
 async function register(req, res, next) {
     const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ email }).exec();
+    const validatedStatus = authSchema.validate(req.body, { abortEarly: false });
 
-        if (user !== null) {
+    if (typeof validatedStatus.error !== "undefined") {
+      return res.status(400).json(validatedStatus.error.details.map((err) => err.message).join(", "));
+    }
+    const user = await User.findOne({ email }).exec();
+
+    if (user !== null) {
             return res.status(409).json('Email in use')
         }
         const passwordHash = await bcrypt.hash(password, 10)
@@ -33,6 +40,12 @@ async function login(req, res, next) {
     const { email, password } = req.body;
 
     try {
+        const validatedStatus = authSchema.validate(req.body, { abortEarly: false });
+
+        if (typeof validatedStatus.error !== "undefined") {
+        return res.status(400).json(validatedStatus.error.details.map((err) => err.message).join(", "));
+        }
+
         const user = await User.findOne({ email }).exec();
 
         if (user === null) {
