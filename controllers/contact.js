@@ -2,7 +2,8 @@ const Contact = require('../models/contact');
 
 async function listContacts(req, res, next) {
   try {
-    const contacts = await Contact.find().exec();
+    const contacts = await Contact.find({owner: req.user.id}).exec();
+
     res.json(contacts);
   } catch (error) {
     next(error); 
@@ -29,12 +30,14 @@ async function addContact(req, res, next) {
     name: req.body.name,
     email: req.body.email,
     phone: req.body.phone,
-    favorite: req.body.favorite
+    favorite: req.body.favorite,
+    owner: req.user.id
   }
  
   try {
-    const answer = await Contact.create(contact);
-    res.json(answer);
+    const newContact = await Contact.create(contact);
+    res.json(newContact);
+    
   } catch (error) {
     if (error.name === 'ValidationError') {
       const validationErrors = Object.values(error.errors).map(e => e.message);
@@ -48,12 +51,12 @@ async function removeContact(req, res, next) {
   const { contactId } = req.params;
 
   try {
-    const answer = await Contact.findByIdAndDelete(contactId);
+    const deleteContact = await Contact.findByIdAndDelete(contactId);
 
-    if (answer === null) {
+    if (deleteContact === null) {
       return res.status(404).json('Contact not found')
     }
-    res.json(answer)
+    res.json(deleteContact)
   }catch (error) {
       next(error);
   }
@@ -92,7 +95,6 @@ async function updateStatusContact (req, res, next) {
 
   try {
     const answer = await Contact.findByIdAndUpdate(contactId, {favorite});
-
     if (answer) {
       return res.status(200).json(answer);
     } else {
