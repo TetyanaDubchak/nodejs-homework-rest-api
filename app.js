@@ -1,6 +1,7 @@
 const express = require('express')
 const logger = require('morgan')
 const cors = require('cors')
+const path = require("node:path");
 
 require("./db");
 
@@ -21,7 +22,7 @@ app.use(express.json())
 
 app.use('/api/contacts', auth, contactsRouter);
 app.use('/api/users', authRouter);
-app.use('/api/users', auth, userRouter);
+app.use('/api/users', auth,express.static(path.join(__dirname, "public", "avatars")), userRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found' })
