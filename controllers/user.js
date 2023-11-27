@@ -23,6 +23,12 @@ async function getAvatar(req, res, next) {
 
 async function uploadAvatar(req, res, next) {
     try {
+        const defaultAvatar = path.join(__dirname,"..", "public/avatars/default-avatar.png")
+        if (!req.file) {
+            const user = await User.findByIdAndUpdate(req.user.id, { avatarURL: defaultAvatar }, { new: true }).exec();
+            return res.status(400).sendFile(path.join( user.avatarURL))
+        }
+
         const newPath = path.join(__dirname, "..", "public/avatars", req.file.filename);
         await fs.rename(req.file.path, newPath);
 
