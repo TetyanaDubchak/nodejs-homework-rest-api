@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const gravatar = require('gravatar');
 
 const authSchema = require("../schemas_validation/auth");
 
@@ -18,9 +19,10 @@ async function register(req, res, next) {
     if (user !== null) {
             return res.status(409).json('Email in use')
         }
-        const passwordHash = await bcrypt.hash(password, 10)
+        const passwordHash = await bcrypt.hash(password, 10);
+        const url = gravatar.url(email, {s: '250', r: 'pg', d: '404'});
 
-        await User.create({ email, password: passwordHash })
+        await User.create({ email, password: passwordHash, avatarURL: url})
         res.status(201).json({
              "user": {
                 "email": email,
@@ -31,7 +33,7 @@ async function register(req, res, next) {
       const validationErrors = Object.values(error.errors).map(e => e.message);
       return res.status(400).json(validationErrors);
     }
-        next()
+        next(error)
 
     }
 }
