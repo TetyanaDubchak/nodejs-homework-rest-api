@@ -22,7 +22,7 @@ const api = new ElasticEmail.EmailsApi();
 
 const email = ElasticEmail.EmailMessageData.constructFromObject({
   Recipients: [
-    new ElasticEmail.EmailRecipient("korneliana54@gmail.com")
+    new ElasticEmail.EmailRecipient("fiediak97@gmail.com")
   ],
   Content: {
     Body: [
@@ -31,7 +31,7 @@ const email = ElasticEmail.EmailMessageData.constructFromObject({
         Content: "<strong>Node js welcome</strong>"
       })
     ],
-    Subject: "From Tanya with best regard",
+    Subject: "From Tanya with best regards",
     From: EMAIL_FROM
   }
 });
