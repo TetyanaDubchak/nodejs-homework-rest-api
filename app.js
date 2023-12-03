@@ -9,7 +9,6 @@ require("./db");
 const auth = require('./middleware/auth');
 const contactsRouter = require('./routes/api/contacts');
 const authRouter = require('./routes/api/auth');
-const userRouter = require('./routes/api/users');
 
 
 const app = express()
@@ -22,10 +21,7 @@ app.use(express.json())
 
 
 app.use('/api/contacts', auth, contactsRouter);
-app.use('/api/users', authRouter);
-app.use('/api/users', auth, express.static(path.join(__dirname, "public", "avatars")), userRouter);
-
-
+app.use('/api/users', express.static(path.join(__dirname, "public", "avatars")), authRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found' })
