@@ -11,4 +11,5 @@ const auchSchema = Joi.object({
 
 })
 
+
 module.exports = auchSchema
